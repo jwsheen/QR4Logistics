@@ -1,0 +1,164 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover" />
+    <meta property="og:url" content="https://bstory.ga">
+    <meta property="og:title" content="bQr | 나눔을 엮는 이야기꾼">
+    <meta property="og:description" content="기부하고 나누며 살아내는 이야기를 써 보세요">
+    <meta property="og:image" content="https://bstory.ga/static/metaLogo2.jpg">
+    <meta property="og:site_name" content="bQr Curator">
+    <meta name="description" content="기부하고 나누며 살아내는 이야기를 써 보세요">
+    <meta name="twitter:card" content="bQr Curator">
+    <meta name="twitter:title" content="bQr | 나눔을 엮는 이야기꾼">
+    <meta name="twitter:url" content="https://bstory.ga">
+    <meta name="twitter:description" content="기부하고 나누며 살아내는 이야기를 써 보세요">
+    <meta name="twitter:image" content="https://bstory.ga/static/metaLogo2.jpg">
+    <meta itemprop="image" content="https://bstory.ga/static/metaLogo2.jpg">
+
+    <title>bQr Curator</title>
+    <style>
+    .container {
+      text-align: center;
+    }
+
+    .container ul {
+        padding: 0 0 0 20px;
+        margin: 0;
+        list-style: none;
+    }
+
+    input[type="password"] {
+      margin-left: 3px;
+      border: 1px solid #597D3E;
+      vertical-align: middle;
+      line-height: 30px;
+      margin-bottom: 3px;
+      width: 60%;
+    }
+
+    input[type="submit" i] {
+        background: #597D3E;
+        color: white;
+        border-style: outset;
+        border-color: #98BF64;
+        height: 35px;
+        width: auto;
+        font: bold 15px arial, sans-serif;
+        text-shadow:none;
+    }
+
+    label {
+      background-color: #E0E0E0;
+      color: #597D3E;
+      padding: 0.5rem;
+      font-family: sans-serif;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    li,dt {
+        font-size: small;
+        text-align: left;
+    }
+
+    </style>
+</head>
+
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js"></script>
+<script>
+function createCookie(name,value,days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+	}
+	else var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/; flavor=choco; SameSite=Lax; Secure";
+}
+
+function readCookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+
+function eraseCookie(name) {
+	createCookie(name,"",-1);
+}
+
+function IsSubmit() {
+  if (document.forms['input'].qrdata.value === null) {
+    return false;
+  }
+  if (document.forms['input'].qrdata.value === "") {
+    return false;
+  }
+  return true;
+}
+
+var x = readCookie('iQrcookie1')
+if (x) {
+	/* 쿠키가 맞나? */
+	/*debugger;*/
+	console.log(x)
+}else{
+    /*debugger;*/
+    createCookie('iQrcookie1',uuid(),1)
+}
+</script>
+
+<div class="container">
+<h1>To Dare is To Do</h1>
+<form name="input" action="/qrscan/" method="post">
+    <label for="qrdata"><img src="/static/bQr-logo2-thumbnail.jpg" width="32px" style="vertical-align: -webkit-baseline-middle; margin-bottom: 13px;"/></label>
+    <input type="password" id="qrdata" name="qrdata" size="20" autofocus="autofocus" >
+    <input hidden type="text" id="geocity" name="geocity">
+    <input hidden type="submit" value="iQr" onclick="return IsSubmit();">
+</form>
+
+<hr style="width: 90%; color:green; border: thin solid black;">
+
+<h1>Data</h1>
+<dl style="width:90%; margin-left:auto; margin-right:auto;">
+<!-- For loop logic of jinja template -->
+
+{% for inputdata in dataQueue[-20:] %}
+    <dt {% if loop.last %} style="background-color: lightgoldenrodyellow;" {% endif %}>
+        <a href="/waybill/{{inputdata[0]|default('NA',true)}}" style="font-size:large;">{{inputdata[0]|default('NA',true)}}</a>&nbsp
+        <a href="/BOX/{{inputdata[1]|default('NA',true)}}">{{inputdata[1][-2:]|default('NA',true)}}</a>&nbsp
+        <a href="/products/{{inputdata[2]|default('NA',true)}}" style="font-size:large;">{{inputdata[2]|default('NA',true)}}</a>&nbsp
+        <br><span style="font-size:xx-small; margin-left: 50%;" >{{inputdata[3][:19]}}|</span>
+        {% if loop.last %}
+            {% if inputdata[0] != "NA" and inputdata[2] != "NA" %}
+                <audio autoplay id="audio" src="/static/sound1Product.wav"></audio>
+            {% elif inputdata[0] != "NA" and inputdata[1] == "NA" and inputdata[2] == "NA" %}
+                <audio autoplay id="audio" src="/static/sound2WayBill.wav"></audio>
+            {% else  %}
+                <audio autoplay id="audio" src="/static/sound3UnKnownData.wav"></audio>
+            {% endif %}
+        {% endif %}
+    </dt>
+{% endfor %}
+</dl>
+<p><a href="/print/">Job History</a>&nbsp;<a href="/rawdata/">Scan History</a></p>
+    <input hidden type="text" id="myUUID" style="font-size:xx-small;"  value=""/>
+</div>
+
+<script type="application/javascript">
+  function getIP(json) {
+    document.getElementById('geocity').value = json.ip;
+    /* console.log(JSON.stringify(json, null, 2)); */
+  }
+</script>
+
+<script type="application/javascript" src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
+
+{% include 'footer.html' %}
+</body>
+</html>

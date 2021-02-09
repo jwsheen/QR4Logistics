@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<head>
+<title>감사합니다</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    #headimg {
+        -webkit- filter: grayscale(100%);  /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
+    .container {
+      text-align: center;
+    }
+    .container ul {
+        padding: 0 0 0 20px;
+        margin: 0;
+        list-style: none;
+    }
+
+    input[type="text"] {
+      margin-left: 3px;
+      border: 1px solid #597D3E;
+      vertical-align: middle;
+      line-height: 33px;
+      margin-bottom: 5px;
+      width: 65%;
+    }
+
+    input[type="submit" i] {
+        background: #597D3E;
+        color: white;
+        border-style: outset;
+        border-color: #98BF64;
+        height: 35px;
+        width: 100px;
+        font: bold 15px arial, sans-serif;
+        text-shadow:none;
+    }
+
+    label {
+      background-color: #E0E0E0;
+      color: #597D3E;
+      padding: 0.5rem;
+      font-family: sans-serif;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+input {
+  font-size: 20px;
+  height:50px;
+}
+.imagediv {
+	float:left;
+    margin-top:50px;
+}
+.imagediv .showonhover {
+	background:red;
+	padding:20px;
+	opacity:0.9;
+	color:white;
+	width: 100%;
+	display:block;
+	text-align:center;
+	cursor:pointer;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(e) {
+        $(".showonhover").click(function(){
+			$("#selectfile").trigger('click');
+		});
+    });
+
+var input = document.querySelector('input[type=file]');
+
+input.onchange = function () {
+  var file = input.files[0];
+
+  drawOnCanvas(file);
+  displayAsImage(file);
+};
+
+function drawOnCanvas(file) {
+  var reader = new FileReader();
+
+  reader.onload = function (e) {
+    var dataURL = e.target.result,
+        c = document.querySelector('canvas'),
+        ctx = c.getContext('2d'),
+        img = new Image();
+
+    img.onload = function() {
+      c.width = img.width;
+      c.height = img.height;
+      ctx.drawImage(img, 0, 0);
+    };
+
+    img.src = dataURL;
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function displayAsImage(file) {
+  var imgURL = URL.createObjectURL(file),
+      img = document.createElement('img');
+
+  img.onload = function() {
+    URL.revokeObjectURL(imgURL);
+  };
+
+  img.src = imgURL;
+  document.body.appendChild(img);
+}
+
+$("#upfile1").click(function () {
+    $("#file1").trigger('click');
+});
+
+</script>
+</head>
+
+<div class="container">
+    <table>
+        <tbody><tr>
+            <td><img id="headimg" src="{{url_for('static', filename='product_page_image.jpg')}}" align="middle" width="100%">
+            </td>
+        </tr>
+            <td><img src="{{ url_for('find_files', filename='BeautifulStory') }}" width="200" alt="BeautifulStory" >
+            </td>
+            ><tr>
+            <td>
+                <h2>아름다운 기부천사 <u>{{name}}</u></h2>
+                    {% if info %}
+                    <ul>
+                    <li>{{ info }}</li>
+                    </ul>
+                    {% endif %}
+            </td>
+        </tr><tr>
+            <td><h2>기부 이야기</h2></td>
+        </tr><tr>
+            <td>
+                {% if uStory %}
+                    {% for iStr in uStory[-3] %}
+                        {% if (iStr[0] == name) and (loop.index < 3) %}
+                        <li>{{ iStr[1] }}</li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </td>>
+        </tr></tbody>
+    </table>
+</div>
+
+<p></p>
+<div style="text-align: center">
+<form method="post" action="/upload_story/" enctype="multipart/form-data">
+    <dl>
+		<p>
+			<label title="QRStory">story</label>
+			<input autofocus type="text" name="donor_story" autocomplete="off" >
+			<input hidden type="text" name="customer_story" autocomplete="off" >
+            {% if name %}
+			<input hidden type="text" name="prod_name" value="{{name}}" autocomplete="off" >
+            {% else %}
+			<input hidden type="text" name="prod_name" value="BeautifulStory" autocomplete="off" >
+            {% endif %}
+		</p>
+    </dl>
+    <p>
+		<input hidden type="submit" value="이야기 쓰기">
+        <input type="image" src="/static/pencil-cartoon.jpg" width="50" alt="Submit">
+	</p>
+</form>
+</div>
+
+<hr style="width: 90%; color:green; border: thin solid black;">
+<div style="text-align: center">
+    <h2 align="center">Take a photo to upload</h2>
+<form method="post" action="/upload_users/" name="pUpForm" enctype="multipart/form-data">
+    <dl>
+		<p>
+			<label for="fileOTHER">Photo</label>
+			<input type="file" name="file"  value="사진선택" maxsize="255" onbeforeeditfocus="return false;" onchange="form.submit()" id="fileOTHER" ><br>
+            {% if name %}
+			<input hidden type="text" name="prod_name" value="{{name}}" autocomplete="off" >
+            {% else %}
+			<input hidden type="text" name="prod_name" value="BeautifulStory" autocomplete="off" >
+            {% endif %}
+		</p>
+    </dl>
+    <p>
+        <button hidden name="action" value="blue"><img src="/static/add_Image_button.png" onclick="document.getElementById('fileOTHER').click();" width="40" alt="blue"></button>
+        <input hidden type="image" src="/static/add_Image_button.png" width="50" >
+	</p>
+</form>
+
+</div>
+
+<div align="left" class="imagediv">
+
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+
+<h3>To an image "click on the image below"</h3>
+<input type="file" id="file1" name="image" accept="image/*" capture style="display:none"/>
+<img src="/static/iphone-camera-icon-150x150.jpg" width="100" id="upfile1" style="cursor:pointer" />
+</p>
+
+<canvas id="canvas" width="300" height="300"></canvas>
+</div>
+
+<div style="text-align:right;">
+    <span style="font-size: xx-small;">Provided by 아름다운QR World</span>
+</div>
+

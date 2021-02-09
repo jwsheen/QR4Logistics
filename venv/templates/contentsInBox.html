@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset= "UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover" />
+  <title>Worker Story</title>
+
+<style>
+/* -webkit- filter : Safari 6.0 - 9.0 */
+/*
+#headimg {
+    -webkit- filter: grayscale(100%);
+    filter: grayscale(100%) brightness(125%);
+}
+*/
+
+#headimg {
+    height: 30px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0px;
+}
+
+.container {
+  text-align: center;
+}
+
+label, textarea {
+    font-size: .8rem;
+    letter-spacing: 1px;
+}
+
+textarea {
+    padding: 10px;
+    line-height: 1.5;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 1px #999;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+#product-image {
+    height: 200px;
+    width: auto;
+}
+
+.worklog {
+  display: flex;
+  flex-flow: column-reverse;
+  margin-bottom: 1em;
+}
+
+label, input {
+  transition: all 0.2s;
+  touch-action: manipulation;
+}
+
+input {
+  font-size: 1.5em;
+  border: 0;
+  border-bottom: 1px solid #ccc;
+  font-family: inherit;
+  -webkit-appearance: none;
+  border-radius: 0;
+  padding: 0;
+  cursor: text;
+}
+
+input:focus {
+  outline: 0;
+  border-bottom: 1px solid #666;
+}
+
+label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+input:placeholder-shown + label {
+  cursor: text;
+  max-width: 66.66%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform-origin: left bottom;
+  transform: translate(0, 2.125rem) scale(1.5);
+}
+
+::-webkit-input-placeholder {
+  opacity: 0;
+  transition: inherit;
+}
+
+input:focus::-webkit-input-placeholder {
+  opacity: 1;
+}
+
+input:not(:placeholder-shown) + label,
+input:focus + label {
+  transform: translate(0, 0) scale(1);
+  cursor: pointer;
+}
+
+align-content:center;
+div[contenteditable] {
+    width: 90%;
+    font-size: 1.5em;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+    font-family: inherit;
+    -webkit-appearance: none;
+    border-radius: 0;
+    padding: 0;
+    cursor: text;
+}
+div[contenteditable]:focus {
+    outline: 0;
+    border-bottom: 1px solid #666;
+}
+
+div[contenteditable]:focus::-webkit-input-placeholder {
+  opacity: 1;
+}
+
+div[contenteditable]:not(:placeholder-shown) + label,
+div[contenteditable]:focus + label {
+  transform: translate(0, 0) scale(1);
+  cursor: pointer;
+}
+div[contenteditable]:placeholder-shown + label {
+  cursor: text;
+  max-width: 66.66%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform-origin: left bottom;
+  transform: translate(0, 2.125rem) scale(1.5);
+}
+.notification {
+  background-color: #FFFFFF;
+  color: black;
+  text-decoration: none;
+  padding: 5px 10px;
+  position: relative;
+  display: inline-block;
+  border-radius: 5px;
+}
+
+.notification:hover {
+  background: red;
+}
+
+.notification .badge {
+  position: absolute;
+  top: -8px;
+  right: -5px;
+  padding: 2px 10px;
+  border-radius: 50%;
+  background-color: white;
+  background: rgba(76, 175, 80, 0.3);
+  color: #171717;
+}
+
+.image-cropper {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 15%;
+}
+
+.image-cropper img.rounded {
+  object-fit: cover;
+  object-position: 20% 80%;
+  border-radius: 15%;
+  height: 120px;
+  width: 120px;
+}
+</style>
+</head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script type="text/javascript" src="//geoip-js.com/js/apis/geoip2/v2.1/geoip2.js"></script>
+
+<body style="text-align:center;">
+  <script src="//code.jquery.com/jquery-1.8.3.min.js"></script>
+  <img id="headimg" src="/static/headimg.png" />
+
+  <div class="container">
+    <h3>{% if info %} {{info[4]|default('기부자',true)}}({{info[2]|default('today',true)}}) {% endif %}님 </h3>
+
+    <div class="loghere" style="text-align: center">
+        <!-- h3 align="center">Write your story</h3-->
+        <dl style="font-size:16px; background-color:#fafafa; padding:0px;">
+            <p class="notification" style="background-color:#f2f2f2; margin-top:10px;margin-bottom:2px;">
+              <span>의류</span>
+                <span class="badge"><b>{{cat[0]}}</b></span>
+              </p>&nbsp;&nbsp;&nbsp;<p class="notification" style="background-color:#f2f2f2; margin-top:10px;margin-bottom:2px;">
+              <span>잡화</span>
+            <span class="badge"><b>{{cat[1]}}</b></span>
+              </p>&nbsp;&nbsp;&nbsp;<p class="notification" style="background-color:#f2f2f2; margin-top:10px;margin-bottom:2px;">
+              <span>도서</span>
+              <span class="badge">{{cat[2]}}</span>
+              </p>&nbsp;&nbsp;&nbsp;<p class="notification" style="background-color:#f2f2f2; margin-top:10px;margin-bottom:2px;">
+              <span>가전</span>
+              <span class="badge">{{cat[3]}}</span>
+            </p>
+
+            <p style="display:none;">{%- for ll in list %}{{ll[0]}}, {{ll[1]}}, {{ll[2]}}<br>
+                <span style="font-size:12px;">{{ll[3]}}</span><br>{%- endfor %}
+            </p>
+        </dl>
+        <!-- hr -->
+        <ul style="color:blue; padding:0px">{%- if jStory %}{% for iStr in jStory[-3:] %}{% if (iStr[0] == name) %}
+            <ol style="padding:0px;">{{ iStr[1] }} <span style="font-size:xx-small;">{{ iStr[2] }}</span></ol>{% endif -%}{% endfor %}{% endif %}
+        </ul>
+    <!-- form method="get" action="/desc_job/" enctype="multipart/form-data" -->
+    <form method="get" action="/joblog/" id="joblog" enctype="multipart/form-data">
+        <dl>
+                <div class="worklog" id="workers">
+                    <input type="text" name="job_story" id="story" placeholder="송화인 이름, 전화번호, 주소가..." style="margin-top:100px; background: url(/static/pencil-tiny-18x18.png) no-repeat right center;"/>
+                    <label for="story">UnBox 작업 기록</label>
+                    <input hidden type="text" name="info" id="info1" value="{{info}}"/>
+                    <input hidden type="text" name="city" id="geocity" value="0"/>
+                    <input hidden type="submit" id="submit" value="ok" width="100%"/>
+                    <input hidden type="text" name="name" value="{{name|default('BeautifulStory',true)}}" autocomplete="off" />
+                </div>
+                <div class="images" style="width:90%; text-align: center; margin-left: auto; margin-right: auto;">
+                    <img class="image-cropper" id="product-image" src="{{filename|default('/static/3-BeautifulStory.jpg',true)}}" class="rounded" />
+                </div>
+
+        </dl>
+    </form>
+    </div>
+
+    <h3>운송장과 Box 물품상태 사진 올리기 </h3>
+    <form method="post" action="/bill_images/" id="pUpForm" name="pUpForm" enctype="multipart/form-data">
+    <input type="file" id="file1" name="file" accept="image/*" capture style="display:none"/>
+            {% if name %}
+			<input hidden type="text" name="waybillNo" value="{{name|default('BeautifulStory',true)}}" autocomplete="off" >
+            {% endif %}
+            <input hidden type="text" name="info" id="info2" value="{{info}}">
+    <img src="/static/camera-icon.jpg" width="50px"  id="upfile1" style="cursor:pointer" />
+
+    <canvas id="canvas" style="display:none;" width="100" height="100" ></canvas>
+    </form>
+          <a href="/getQRData/">Get QR Data</a>
+</div>
+
+<script id="rendered-js" >
+$(document).ready( function (e) {
+  $( ".showonhover ").click(function () {
+    $( "#selectfile ").trigger('click');
+  });
+});
+
+var input = document.querySelector('input[type=file]');
+
+input.onchange = function () {
+  var file = input.files[0];
+
+  /*
+  drawOnCanvas(file);
+  displayAsImage(file);
+  */
+
+  document.getElementById("pUpForm").submit();
+};
+
+function drawOnCanvas(file) {
+  var reader = new FileReader();
+
+  reader.onload = function (e) {
+    var dataURL = e.target.result,
+    c = document.querySelector('canvas'),
+    ctx = c.getContext('2d'),
+    img = new Image(100,100);
+
+    img.onload = function () {
+      c.width = img.width;
+      c.height = img.height;
+      ctx.drawImage(img, 100, 100);
+    };
+
+    img.src = dataURL;
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function displayAsImage(file) {
+  var imgURL = URL.createObjectURL(file),
+  img = document.createElement('img');
+
+  img.onload = function () {
+    URL.revokeObjectURL(imgURL);
+  };
+
+  img.src = imgURL;
+  img.style.width = '100px';
+  img.style.height = '100px';
+
+  document.body.appendChild(img);
+}
+
+$( "#upfile1").click(
+    function () {
+  $( "#file1").trigger('click');
+});
+
+</script>
+
+<script type="application/javascript">
+  function getIP(json) {
+    document.getElementById('geocity').value = json.ip;
+    /* console.log(JSON.stringify(json, null, 2)); */
+  }
+</script>
+
+<script type="application/javascript" src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
+
+{% include 'footer.html' %}
+
+</body>
+
+</html>
